@@ -369,20 +369,20 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
       persist_write_int( SETTING_LANGUAGE_KEY, value );
       current_language = value;
 	  
+
 	  if (startday_status) {
-//		  layer_set_hidden(text_layer_get_layer(text_days_layer), true);
-//		  		  layer_set_hidden(text_layer_get_layer(text_days_layer2), false);
+		  	  		    layer_mark_dirty( text_layer_get_layer( text_days_layer));
 
-  text_layer_set_text( text_days_layer2, day_lines2[current_language] );
+  			text_layer_set_text( text_days_layer, day_lines2[current_language] );
+		 //   layer_mark_dirty( text_layer_get_layer( text_days_layer2));
+
 	  } else {
+		  	  		    layer_mark_dirty( text_layer_get_layer( text_days_layer));
 
-//		  layer_set_hidden(text_layer_get_layer(text_days_layer2), true);
-//		  layer_set_hidden(text_layer_get_layer(text_days_layer), false);
-
-  text_layer_set_text( text_days_layer, day_lines[current_language] );
+			text_layer_set_text( text_days_layer, day_lines[current_language] );
+		   // layer_mark_dirty( text_layer_get_layer( text_days_layer));
 
 	  }
-
       break;
 
     case SETTING_FORMAT_KEY:
@@ -390,27 +390,20 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
       current_format = value;
       break; 
 	  
-	  
 	case SETTING_TEXTCOL_KEY:
       persist_write_int( SETTING_TEXTCOL_KEY, value );
       textcol_format = value;
-	  
-	  if (textcol_format) {
-		  
+	  if (textcol_format) {	  
 		   text_layer_set_text_color(text_time_layer, GColorWhite);
 		   text_layer_set_text_color(text_week_layer, GColorWhite);
-
 	  } else {
 			text_layer_set_text_color(text_time_layer, GColorWhite);
 			text_layer_set_text_color(text_week_layer, GColorWhite);
-
 		#ifdef PBL_COLOR	
 		 text_layer_set_text_color(text_time_layer, GColorChromeYellow);
 		 text_layer_set_text_color(text_week_layer, GColorChromeYellow);
 		#endif		
-
 	  }
-	  
       break;
 	  
 	case SETTING_INVERT_KEY:
@@ -435,10 +428,8 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
 	case SETTING_WEATHERSTATUS_KEY:
       persist_write_int( SETTING_WEATHERSTATUS_KEY, value );
       weather_status = value;
-
       layer_set_frame( text_layer_get_layer( temp_layer ), ( weather_status == WEATHER_ON ) ? TEMP_RECT : EMPTY_RECT );
       layer_set_frame( bitmap_layer_get_layer( icon_layer ), ( weather_status == WEATHER_ON ) ? ICON_RECT : EMPTY_RECT );
-
       break;
 	  
     case BLUETOOTHVIBE_KEY:
@@ -449,21 +440,6 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
     case STARTDAY_KEY:
 	  persist_write_int( STARTDAY_KEY, value );
       startday_status = value;
-	  /*
-	  	  if (startday_status) {
-			  		  		  layer_set_hidden(text_layer_get_layer(text_days_layer2), false);
-
-		  layer_set_hidden(text_layer_get_layer(text_days_layer), true);
-
-//  text_layer_set_text( text_days_layer2, day_lines2[current_language] );
-	  } else {
-		  layer_set_hidden(text_layer_get_layer(text_days_layer), false);
-
-		  layer_set_hidden(text_layer_get_layer(text_days_layer2), true);
-
-//  text_layer_set_text( text_days_layer, day_lines[current_language] );
-
-	  }*/
       break;      
 	  
 	case HOURLYVIBE_KEY:
@@ -485,7 +461,6 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
 	    	layer_set_hidden(text_layer_get_layer(text_ampm_layer), false);
 	    	tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
       }
-	  
       break;
 	
 	case BACKGROUND1:
@@ -745,29 +720,20 @@ void handle_init( void ) {
   // Setup days line layer
 	
 if (startday_status) {	
-//	if (!NULL) {
-//	layer_remove_from_parent(text_layer_get_layer(text_days_layer));
-//	text_layer_destroy( text_days_layer );
-//	}	
-	//	  layer_set_hidden(text_layer_get_layer(text_days_layer2), false);
-	//	  layer_set_hidden(text_layer_get_layer(text_days_layer), true);
+  text_days_layer = setup_text_layer( DAYS_RECT, GTextAlignmentLeft, font_days );			 
+  layer_add_child( window_layer, text_layer_get_layer( text_days_layer ) );
+  text_layer_set_text( text_days_layer, day_lines2[current_language] );
+//  layer_mark_dirty( text_layer_get_layer( text_days_layer));
 
-
-  text_days_layer2 = setup_text_layer( DAYS_RECT, GTextAlignmentLeft, font_days );			 
-  layer_add_child( window_layer, text_layer_get_layer( text_days_layer2 ) );
-  text_layer_set_text( text_days_layer2, day_lines2[current_language] );
 } else {
-//			if (!NULL) {
-//layer_remove_from_parent(text_layer_get_layer(text_days_layer2));
-//	text_layer_destroy( text_days_layer2 );
-//			}
-	//	  layer_set_hidden(text_layer_get_layer(text_days_layer), false);
-	//	  layer_set_hidden(text_layer_get_layer(text_days_layer2), true);
-
   text_days_layer = setup_text_layer( DAYS_RECT, GTextAlignmentLeft, font_days );			 
   layer_add_child( window_layer, text_layer_get_layer( text_days_layer ) );
   text_layer_set_text( text_days_layer, day_lines[current_language] );
+//  layer_mark_dirty( text_layer_get_layer( text_days_layer));
+
 }
+	//  layer_mark_dirty( text_layer_get_layer( text_days_layer));
+
   effect_layer2 = effect_layer_create(EMPTY_RECT);
   effect_layer_add_effect(effect_layer2, effect_invert, NULL);
   layer_add_child((window_layer), effect_layer_get_layer(effect_layer2));
