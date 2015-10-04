@@ -73,21 +73,16 @@ if (options === null) options = {
 				"location" : "",
 				"units" : "fahrenheit",
 				"status" : "true",
-				"format" : "",
 				"language" : "",
+				"format" : "",
 				"weatherstatus" : "true",
 				"bluetoothvibe" : "false",
-				"startday_status" : "false",
 				"hourlyvibe" : "false",
 				"ampmsecs" : "false",
-				"background1" : "false",
-				"background2" : "false",
-				"background3" : "false",
-				"background4" : "false",
-				"hidebatt" : "false",
-				"hidebt" : "false",
+				"background" : "",
+				"invert" : "false",
 				"textcol" : "false",
-				"invert" : "false" };
+				"startday_status" : "false"};
 
 function getWeatherFromLatLong(latitude, longitude) {
   var response;
@@ -162,20 +157,15 @@ function getWeatherFromWoeid(woeid) {
             "temperature" : temperature,
 			"format" : options["format"],
 			"language" : options["language"],
+			"background" : options["background"],
 			"status" : (options["status"] == "true" ? 1 : 0 ),
 			"weatherstatus" : (options["weatherstatus"] == "true" ? 1 : 0 ),
 			"bluetoothvibe" : (options["bluetoothvibe"] == "true" ? 1 : 0 ),
-			"startday_status" : (options["startday_status"] == "true" ? 1 : 0 ),
 			"hourlyvibe" : (options["hourlyvibe"] == "true" ? 1 : 0 ),
 			"ampmsecs" : (options["ampmsecs"] == "true" ? 1 : 0 ),
-			"background1" : (options["background1"] == "true" ? 1 : 0 ),
-			"background2" : (options["background2"] == "true" ? 1 : 0 ),
-			"background3" : (options["background3"] == "true" ? 1 : 0 ),
-			"background4" : (options["background4"] == "true" ? 1 : 0 ),
-			"hidebatt" : (options["hidebatt"] == "true" ? 1 : 0 ),
-			"hidebt" : (options["hidebt"] == "true" ? 1 : 0 ),
 			"textcol" : (options["textcol"] == "true" ? 1 : 0 ),
 			"invert" : (options["invert"] == "true" ? 1 : 0),
+			"startday_status" : (options["startday_status"] == "true" ? 1 : 0 ),
 
           });
         }
@@ -213,7 +203,7 @@ function locationError(err) {
 }
 
 Pebble.addEventListener('showConfiguration', function(e) {
-	var uri = 'http://www.themapman.com/pebblewatch/trekv36.html?' + 
+	var uri = 'http://www.themapman.com/pebblewatch/trekv38.html?' + 
     'use_gps=' + encodeURIComponent(options['use_gps']) +
     '&location=' + encodeURIComponent(options['location']) +
     '&units=' + encodeURIComponent(options['units']) +
@@ -222,17 +212,12 @@ Pebble.addEventListener('showConfiguration', function(e) {
     '&language=' + encodeURIComponent(options['language']) +
     '&weatherstatus=' + encodeURIComponent(options['weatherstatus']) +
     '&bluetoothvibe=' + encodeURIComponent(options['bluetoothvibe']) +
-    '&startday_status=' + encodeURIComponent(options['startday_status']) +
     '&hourlyvibe=' + encodeURIComponent(options['hourlyvibe']) +
     '&ampmsecs=' + encodeURIComponent(options['ampmsecs']) +
-    '&background1=' + encodeURIComponent(options['background1']) +
-    '&background2=' + encodeURIComponent(options['background2']) +
-    '&background3=' + encodeURIComponent(options['background3']) +
-    '&background4=' + encodeURIComponent(options['background4']) +
-    '&hidebatt=' + encodeURIComponent(options['hidebatt']) +
-    '&hidebt=' + encodeURIComponent(options['hidebt']) +
+    '&background=' + encodeURIComponent(options['background']) +
+    '&invert=' + encodeURIComponent(options['invert']) +
     '&textcol=' + encodeURIComponent(options['textcol']) +
-    '&invert=' + encodeURIComponent(options['invert']);
+    '&startday_status=' + encodeURIComponent(options['startday_status']);
 
   //console.log('showing configuration at uri: ' + uri);
 

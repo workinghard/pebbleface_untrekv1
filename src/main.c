@@ -25,13 +25,14 @@ static const uint32_t WEATHER_ICONS[] = {
 static enum statusKeys { STATUS_OFF = 0, STATUS_ON } current_status;
 static enum weatherstatusKeys { WEATHER_OFF = 0, WEATHER_ON } weather_status;
 static enum secsKeys { SECS_OFF = 0, SECS_ON } ampmsecs;
+static enum backgcolKeys { BLUE = 0, LTBLUE, YELLOW, PURPLE, WHITE, GREY, RED, DKBLUE } bgcol_format;
 static enum bluetoothvibeKey { BLUETOOTHVIBE_OFF = 0, BLUETOOTHVIBE_ON } bluetoothvibe_status;
-static enum startDayKey { SUNDAY_ON = 0, MONDAY_ON } startday_status;
 static enum hourlyvibeKey { HOURLYVIBE_OFF = 0, HOURLYVIBE_ON } hourlyvibe_status;
-static enum formatKeys { FORMAT_WEEK = 0, FORMAT_DOTY, FORMAT_DDMMYY, FORMAT_MMDDYY, FORMAT_WXDX, FORMAT_INT, FORMAT_DOT } current_format;
-static enum languageKeys { LANG_EN = 0, LANG_NL, LANG_DE, LANG_FR, LANG_HR, LANG_ES, LANG_IT, LANG_NO, LANG_FI, LANG_DA, LANG_TU, LANG_CA, LANG_SLO } current_language;
+static enum formatKeys { FORMAT_WEEK = 0, FORMAT_DOTY, FORMAT_DDMMYY, FORMAT_MMDDYY, FORMAT_WXDX, FORMAT_INT, FORMAT_DOT, FORMAT_YWD } current_format;
+static enum languageKeys { LANG_EN = 0, LANG_NL, LANG_DE, LANG_FR, LANG_HR, LANG_ES, LANG_IT, LANG_NO, LANG_SW, LANG_FI, LANG_DA, LANG_TU, LANG_CA, LANG_SL } current_language;
 static enum invertKeys { INVERT_ON = 0, INVERT_OFF } invert_format;
 static enum textcolKeys { COLA_OFF = 0, COLB_ON } textcol_format;
+static enum startDayKey { SUNDAY_ON = 0, MONDAY_ON } startday_status;
 
 // Setting keys
 enum settingKeys {
@@ -44,34 +45,24 @@ enum settingKeys {
   BLUETOOTHVIBE_KEY = 0x6,
   HOURLYVIBE_KEY = 0x7,
   SECS_KEY = 0x8,
-  BACKGROUND1 = 0x9,
-  BACKGROUND2 = 0xA,
-  BACKGROUND3 = 0xB,
-//  HIDE_BATT = 0xC,
-  SETTING_INVERT_KEY = 0xD,
-  SETTING_TEXTCOL_KEY = 0xE,
-//  HIDE_BT = 0xF,
-  BACKGROUND4 = 0x10,
-  STARTDAY_KEY = 0x11
+  BACKGROUND = 0x9,
+  SETTING_INVERT_KEY = 0xA,
+  SETTING_TEXTCOL_KEY = 0xB,
+  STARTDAY_KEY = 0xC,
 };
 
 static int hourlyvibe;
-//static int hidebatt;
-//static int hidebt;
-static int background1;
-static int background2;
-static int background3;
-static int background4;
+static int background;
 
 static bool appStarted = false;
 
 // All UI elements
 static Window         *window;
+static Layer 		  *window_layer;
 static Layer 		  *weather_holder;
 
 EffectLayer  		  *effect_layer;
 EffectLayer 		  *effect_layer2;
-EffectLayer			  *effect_layer = NULL;
 
 static GBitmap        *battery_image;
 static GBitmap        *bluetooth_image;
@@ -85,7 +76,6 @@ static TextLayer      *text_time_layer;
 static TextLayer      *text_ampm_layer;
 static TextLayer      *text_secs_layer;
 static TextLayer      *text_days_layer;
-static TextLayer      *text_days_layer2;
 static TextLayer      *text_date_layer;
 static TextLayer      *text_week_layer;
 static TextLayer	  *battery_text_layer;
@@ -107,15 +97,21 @@ static BitmapLayer *block24_layer;
 
 static GBitmap *background_image1;
 static BitmapLayer *background_layer1;
-
 static GBitmap *background_image2;
 static BitmapLayer *background_layer2;
-
 static GBitmap *background_image3;
 static BitmapLayer *background_layer3;
-
 static GBitmap *background_image4;
 static BitmapLayer *background_layer4;
+static GBitmap *background_image5;
+static BitmapLayer *background_layer5;
+static GBitmap *background_image6;
+static BitmapLayer *background_layer6;
+static GBitmap *background_image7;
+static BitmapLayer *background_layer7;
+static GBitmap *background_image8;
+static BitmapLayer *background_layer8;
+
 
 // Define layer rectangles (x, y, width, height)
 GRect TIME_RECT      = ConstantGRect(  29,   5, 110,  72 );
@@ -251,6 +247,100 @@ void invert_screen(bool invert_format) {
   } 
 }
 
+void bgcol() {
+	
+	switch (background) {
+		
+	case 0:
+				layer_set_hidden(bitmap_layer_get_layer(background_layer1), false);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
+	break;
+	
+	case 1:
+				layer_set_hidden(bitmap_layer_get_layer(background_layer2), false);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);
+	break;
+	
+	case 2:
+				layer_set_hidden(bitmap_layer_get_layer(background_layer3), false);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
+	break;
+	
+	case 3:
+				layer_set_hidden(bitmap_layer_get_layer(background_layer4), false);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
+	break;
+		
+	case 4:
+				layer_set_hidden(bitmap_layer_get_layer(background_layer5), false);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
+	break;
+
+	case 5:
+				layer_set_hidden(bitmap_layer_get_layer(background_layer6), false);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
+	break;
+		
+	case 6:
+				layer_set_hidden(bitmap_layer_get_layer(background_layer7), false);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
+	break;
+		
+	case 7:
+				layer_set_hidden(bitmap_layer_get_layer(background_layer8), false);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
+				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
+	break;
+	}	
+}
+
 /*
   Update status indicators for the battery and bluetooth connection
 */
@@ -273,7 +363,7 @@ void handle_tick( struct tm *tick_time, TimeUnits units_changed ) {
 	
 	if (units_changed & HOUR_UNIT) {
     hourvibe(tick_time);
-   }
+}
 	
   // Update text layer for current day
 	
@@ -282,10 +372,9 @@ void handle_tick( struct tm *tick_time, TimeUnits units_changed ) {
   layer_set_frame( effect_layer_get_layer(effect_layer2), highlight_rect2[current_language][today] );
 	} else {
   int today = tick_time->tm_wday - 1; if ( today < 0 ) { today = 6; }
-  layer_set_frame( effect_layer_get_layer(effect_layer2), highlight_rect[current_language][today] );
-		
+  layer_set_frame( effect_layer_get_layer(effect_layer2), highlight_rect[current_language][today] );		
 	}
-	
+
   #ifdef LANGUAGE_TESTING
   layer_set_frame( effect_layer_get_layer(effect_layer2), hightlight_rect[current_language][ct] );
     if ( tick_time->tm_sec % speed == 0 ) { ct++; }
@@ -338,13 +427,16 @@ void handle_tick( struct tm *tick_time, TimeUnits units_changed ) {
     update_status();
   }	
   if ( invert_format == INVERT_OFF ) {
-    invert_screen(invert_format);
+    update_status();
+    //invert_screen(invert_format);
   }	
   if ( textcol_format == COLB_ON ) {
     update_status();
   }
-	
   if ( startday_status == MONDAY_ON ) {
+    update_status();
+  }
+  if ( bgcol_format == BLUE ) {
     update_status();
   }
 }
@@ -368,48 +460,11 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
     case SETTING_LANGUAGE_KEY:
       persist_write_int( SETTING_LANGUAGE_KEY, value );
       current_language = value;
-	  
-
-	  if (startday_status) {
-		  	  		    layer_mark_dirty( text_layer_get_layer( text_days_layer));
-
-  			text_layer_set_text( text_days_layer, day_lines2[current_language] );
-		 //   layer_mark_dirty( text_layer_get_layer( text_days_layer2));
-
-	  } else {
-		  	  		    layer_mark_dirty( text_layer_get_layer( text_days_layer));
-
-			text_layer_set_text( text_days_layer, day_lines[current_language] );
-		   // layer_mark_dirty( text_layer_get_layer( text_days_layer));
-
-	  }
       break;
 
     case SETTING_FORMAT_KEY:
       persist_write_int( SETTING_FORMAT_KEY, value );
       current_format = value;
-      break; 
-	  
-	case SETTING_TEXTCOL_KEY:
-      persist_write_int( SETTING_TEXTCOL_KEY, value );
-      textcol_format = value;
-	  if (textcol_format) {	  
-		   text_layer_set_text_color(text_time_layer, GColorWhite);
-		   text_layer_set_text_color(text_week_layer, GColorWhite);
-	  } else {
-			text_layer_set_text_color(text_time_layer, GColorWhite);
-			text_layer_set_text_color(text_week_layer, GColorWhite);
-		#ifdef PBL_COLOR	
-		 text_layer_set_text_color(text_time_layer, GColorChromeYellow);
-		 text_layer_set_text_color(text_week_layer, GColorChromeYellow);
-		#endif		
-	  }
-      break;
-	  
-	case SETTING_INVERT_KEY:
-      persist_write_int( SETTING_INVERT_KEY, value );
-      invert_format = value;
-      invert_screen(invert_format);
       break; 
 	  
 	case SETTING_ICON_KEY:
@@ -435,12 +490,7 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
     case BLUETOOTHVIBE_KEY:
 	  persist_write_int( BLUETOOTHVIBE_KEY, value );
       bluetoothvibe_status = value;
-      break;      
-
-    case STARTDAY_KEY:
-	  persist_write_int( STARTDAY_KEY, value );
-      startday_status = value;
-      break;      
+      break;        
 	  
 	case HOURLYVIBE_KEY:
 	  persist_write_int( HOURLYVIBE_KEY, value );
@@ -463,70 +513,43 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
       }
       break;
 	
-	case BACKGROUND1:
-	  background1 = tuple_new->value->uint8 != 0;
-	  persist_write_bool(BACKGROUND1, background1);
-		if (background1) {
-			layer_set_hidden(bitmap_layer_get_layer(background_layer1), false);
-		} else {
-			layer_set_hidden(bitmap_layer_get_layer(background_layer1), false);	
-		}
+	case BACKGROUND:
+	  	  persist_write_int( BACKGROUND, value );
+          background = value;
+	      bgcol();
 	break; 
+	  
+	case SETTING_INVERT_KEY:
+      persist_write_int( SETTING_INVERT_KEY, value );
+      invert_format = value;
+      invert_screen(invert_format);
+      break; 
+	  
+	case SETTING_TEXTCOL_KEY:
+      persist_write_int( SETTING_TEXTCOL_KEY, value );
+      textcol_format = value;
+	  if (textcol_format) {	  
+		   text_layer_set_text_color(text_time_layer, GColorWhite);
+		   text_layer_set_text_color(text_week_layer, GColorWhite);
+	  } else {
+			text_layer_set_text_color(text_time_layer, GColorWhite);
+			text_layer_set_text_color(text_week_layer, GColorWhite);
+		#ifdef PBL_COLOR	
+		 text_layer_set_text_color(text_time_layer, GColorChromeYellow);
+		 text_layer_set_text_color(text_week_layer, GColorChromeYellow);
+		#endif		
+	  }
+      break;
+	  	  
+	  
+    case STARTDAY_KEY:
+	  persist_write_int( STARTDAY_KEY, value );
+      startday_status = value;  	 
+	  break;    
 
-    case BACKGROUND2:
-	  background2 = tuple_new->value->uint8 != 0;
-	  persist_write_bool(BACKGROUND2, background2);
-		if (background2) {
-			layer_set_hidden(bitmap_layer_get_layer(background_layer2), false);
-		} else {
-			layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
-		}
-	break; 
-
-	case BACKGROUND3:
-	  background3 = tuple_new->value->uint8 != 0;
-	  persist_write_bool(BACKGROUND3, background3);
-		if (background3) {
-			layer_set_hidden(bitmap_layer_get_layer(background_layer3), false);
-		} else {
-			layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
-		}
-	break; 
-
-	 	case BACKGROUND4:
-	  background4 = tuple_new->value->uint8 != 0;
-	  persist_write_bool(BACKGROUND4, background4);
-		if (background4) {
-			layer_set_hidden(bitmap_layer_get_layer(background_layer4), false);
-		} else {
-			layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
-		}
-	break; 
-
-	/*  
-	case HIDE_BATT:
-	  hidebatt = tuple_new->value->uint8 != 0;
-	  persist_write_bool(HIDE_BATT, hidebatt);
-		if (hidebatt) {
-			layer_set_hidden(bitmap_layer_get_layer(battery_layer), true);
-		} else {
-			layer_set_hidden(bitmap_layer_get_layer(battery_layer), false);	
-		}
-	break; 
- 
-	case HIDE_BT:
-	  hidebt = tuple_new->value->uint8 != 0;
-	  persist_write_bool(HIDE_BT, hidebt);
-		if (hidebt) {
-			layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer), true);
-		} else {
-			layer_set_hidden(bitmap_layer_get_layer(bluetooth_layer), false);	
-		}
-	break; */
   }
   // Refresh display
   update_time();
-
 }
 
 /*
@@ -541,12 +564,21 @@ static void app_error_callback( DictionaryResult dict_error, AppMessageResult ap
   Force update of time
 */
 void update_time() {
-    // Get current time
+	
+	 if (startday_status) {
+     	  	layer_mark_dirty( text_layer_get_layer( text_days_layer));
+			text_layer_set_text( text_days_layer, day_lines2[current_language] );
+	  		} else {
+		  	layer_mark_dirty( text_layer_get_layer( text_days_layer));
+			text_layer_set_text( text_days_layer, day_lines[current_language] );
+	  		}
+	
+  // Get current time
   time_t now = time( NULL );
   struct tm *tick_time = localtime( &now );
 
   // Force update to avoid a blank screen at startup of the watchface
-  handle_tick( tick_time, DAY_UNIT + SECOND_UNIT );
+  handle_tick( tick_time, MONTH_UNIT + DAY_UNIT + HOUR_UNIT + MINUTE_UNIT + SECOND_UNIT );
 
 }
 
@@ -609,6 +641,11 @@ void handle_init( void ) {
   } else {
     textcol_format = COLB_ON;
   }
+ if ( persist_exists( BACKGROUND ) ) {
+    bgcol_format = persist_read_int( BACKGROUND );
+ } else {
+    bgcol_format = BLUE;
+  }	
 	
   // Read watchface settings from persistent data or use default values
   current_status = persist_exists( SETTING_STATUS_KEY ) ? persist_read_int( SETTING_STATUS_KEY ) : STATUS_ON;
@@ -616,37 +653,13 @@ void handle_init( void ) {
   current_language = persist_exists( SETTING_LANGUAGE_KEY ) ? persist_read_int( SETTING_LANGUAGE_KEY ) : LANG_EN;
   current_format = persist_exists( SETTING_FORMAT_KEY ) ? persist_read_int( SETTING_FORMAT_KEY ) : FORMAT_WEEK;
   bluetoothvibe_status = persist_exists( BLUETOOTHVIBE_KEY ) ? persist_read_int( BLUETOOTHVIBE_KEY ) : BLUETOOTHVIBE_ON;
-  startday_status = persist_exists( STARTDAY_KEY ) ? persist_read_int( STARTDAY_KEY ) : MONDAY_ON;
   hourlyvibe_status = persist_exists( HOURLYVIBE_KEY ) ? persist_read_int( HOURLYVIBE_KEY ) : HOURLYVIBE_ON;
   ampmsecs = persist_exists( SECS_KEY ) ? persist_read_int( SECS_KEY ) : SECS_ON;
   invert_format = persist_exists( SETTING_INVERT_KEY ) ? persist_read_int( SETTING_INVERT_KEY ) : INVERT_OFF;
   textcol_format = persist_exists( SETTING_TEXTCOL_KEY ) ? persist_read_int( SETTING_TEXTCOL_KEY ) : COLB_ON;
+  startday_status = persist_exists( STARTDAY_KEY ) ? persist_read_int( STARTDAY_KEY ) : MONDAY_ON;
+  bgcol_format = persist_exists( BACKGROUND ) ? persist_read_int( BACKGROUND ) : BLUE;
 
-  // Background images
-
-  background_image1 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND1 );
-  background_layer1 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer1, background_image1 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer1 ) );
-
-  background_image2 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND2 );
-  background_layer2 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer2, background_image2 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer2 ) );
-  layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);
-	
-  background_image3 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND3 );
-  background_layer3 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer3, background_image3 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer3 ) );
-  layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);
-
-  background_image4 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND4 );
-  background_layer4 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer4, background_image4 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer4 ) );
-  layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);
-	
   // Initial settings
   Tuplet initial_values[] = { TupletInteger( SETTING_STATUS_KEY, current_status )
 	  						, TupletInteger( SETTING_WEATHERSTATUS_KEY, weather_status )
@@ -655,18 +668,12 @@ void handle_init( void ) {
                             , TupletInteger( BLUETOOTHVIBE_KEY, bluetoothvibe_status )
                             , TupletInteger( HOURLYVIBE_KEY, hourlyvibe_status )
                             , TupletInteger( SECS_KEY, ampmsecs )
+                            , TupletInteger( BACKGROUND, bgcol_format )
 							, TupletInteger( SETTING_ICON_KEY, (uint8_t) 14)
                             , TupletCString( SETTING_TEMPERATURE_KEY, "")
-						    , TupletInteger(BACKGROUND1, persist_read_bool(BACKGROUND1))
-						    , TupletInteger(BACKGROUND2, persist_read_bool(BACKGROUND2))
-							, TupletInteger(BACKGROUND3, persist_read_bool(BACKGROUND3))
-							, TupletInteger(BACKGROUND4, persist_read_bool(BACKGROUND4))
-						//	, TupletInteger(HIDE_BATT, persist_read_bool(HIDE_BATT))
-						//	, TupletInteger(HIDE_BT, persist_read_bool(HIDE_BT))
                             , TupletInteger( SETTING_INVERT_KEY, invert_format)
                             , TupletInteger( SETTING_TEXTCOL_KEY, textcol_format)
                             , TupletInteger( STARTDAY_KEY, startday_status )
-
                             };
 
   // Open AppMessage to transfers
@@ -687,7 +694,7 @@ void handle_init( void ) {
 
   appStarted = true;
 	
-  // Adjust GRect for Hours, Minutes and Blink to compensate for missing AM/PM indicator
+  // Adjust GRect for Hours and Minutes to compensate for missing AM/PM indicator
   if ( clock_is_24h_style() ) {
     TIME_RECT.origin.y = TIME_RECT.origin.y + 1;
   }
@@ -697,8 +704,51 @@ void handle_init( void ) {
   font_days = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_20 ) );
   font_date = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_23 ) );
   font_other = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_19 ) );
-  small_batt = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_TEST_16 ) );
+  small_batt = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_KCREG_16 ) );
 
+  // Background images
+
+  background_image1 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND1 );
+  background_layer1 = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer1, background_image1 );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer1 ) );
+
+  background_image2 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND2 );
+  background_layer2 = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer2, background_image2 );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer2 ) );
+	
+  background_image3 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND3 );
+  background_layer3 = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer3, background_image3 );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer3 ) );
+
+  background_image4 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND4 );
+  background_layer4 = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer4, background_image4 );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer4 ) );
+	
+  background_image5 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND5 );
+  background_layer5 = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer5, background_image5 );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer5 ) );
+	
+  background_image6 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND6 );
+  background_layer6 = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer6, background_image6 );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer6 ) );
+	
+  background_image7 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND7 );
+  background_layer7 = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer7, background_image7 );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer7 ) );
+	
+  background_image8 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND8 );
+  background_layer8 = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer8, background_image8 );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer8 ) );
+
+	
   // Setup time layer
   text_time_layer = setup_text_layer( TIME_RECT, GTextAlignmentRight, font_time );		
   layer_add_child( window_layer, text_layer_get_layer( text_time_layer ) );
@@ -709,36 +759,25 @@ void handle_init( void ) {
   block24_layer = bitmap_layer_create(GRect(125, -1, 25, 20));
   bitmap_layer_set_bitmap(block24_layer, block24_img);
   layer_add_child(window_layer, bitmap_layer_get_layer(block24_layer));	
-	}
-	
+	}	
   text_ampm_layer = setup_text_layer( AMPM_RECT, GTextAlignmentCenter, font_other );
   text_layer_set_background_color(text_ampm_layer, GColorClear);
   layer_add_child( window_layer, text_layer_get_layer( text_ampm_layer ) );
 	
-
-	
   // Setup days line layer
-	
-if (startday_status) {	
-  text_days_layer = setup_text_layer( DAYS_RECT, GTextAlignmentLeft, font_days );			 
-  layer_add_child( window_layer, text_layer_get_layer( text_days_layer ) );
+  text_days_layer = setup_text_layer( DAYS_RECT
+                                    , GTextAlignmentLeft
+                                    , font_days );		
+  if (startday_status) {	
   text_layer_set_text( text_days_layer, day_lines2[current_language] );
-//  layer_mark_dirty( text_layer_get_layer( text_days_layer));
-
-} else {
-  text_days_layer = setup_text_layer( DAYS_RECT, GTextAlignmentLeft, font_days );			 
-  layer_add_child( window_layer, text_layer_get_layer( text_days_layer ) );
+  } else {
   text_layer_set_text( text_days_layer, day_lines[current_language] );
-//  layer_mark_dirty( text_layer_get_layer( text_days_layer));
-
-}
-	//  layer_mark_dirty( text_layer_get_layer( text_days_layer));
+  }
+  layer_add_child( window_layer, text_layer_get_layer( text_days_layer ) );	
 
   effect_layer2 = effect_layer_create(EMPTY_RECT);
   effect_layer_add_effect(effect_layer2, effect_invert, NULL);
   layer_add_child((window_layer), effect_layer_get_layer(effect_layer2));
-	
-
 	
   // Setup date layer
   text_date_layer = setup_text_layer( ( current_status == STATUS_ON ) ? DATE_RECT : OFF_DATE_RECT
@@ -777,8 +816,7 @@ if (startday_status) {
   text_layer_set_background_color(text_secs_layer, GColorBlack);
   layer_add_child( window_layer, text_layer_get_layer( text_secs_layer ) );
 
-  // set up battery text layer
-	
+  // set up battery text layer	
   battery_text_layer = text_layer_create(GRect(55, 78, 26, 20));	
   text_layer_set_background_color(battery_text_layer, GColorBlack);
   text_layer_set_text_color(battery_text_layer, GColorWhite);
@@ -818,6 +856,12 @@ void handle_deinit( void ) {
   destroy_graphics( background_image2, background_layer2 );
   destroy_graphics( background_image3, background_layer3 );
   destroy_graphics( background_image4, background_layer4 );
+  destroy_graphics( background_image5, background_layer5 );
+  destroy_graphics( background_image6, background_layer6 );
+  destroy_graphics( background_image7, background_layer7 );
+  destroy_graphics( background_image8, background_layer8 );
+
+  destroy_graphics( block24_img, block24_layer );
   destroy_graphics( battery_image, battery_layer );
   destroy_graphics( bluetooth_image, bluetooth_layer );
   destroy_graphics( icon_bitmap, icon_layer );
@@ -826,19 +870,18 @@ void handle_deinit( void ) {
   text_layer_destroy( text_time_layer );
   text_layer_destroy( text_ampm_layer );
   text_layer_destroy( text_secs_layer );
-  text_layer_destroy( text_days_layer );
-//	text_days_layer = NULL;
-  text_layer_destroy( text_days_layer2 );
-//	text_days_layer2 = NULL;
-	
+  text_layer_destroy( text_days_layer );	
   text_layer_destroy( text_date_layer );
   text_layer_destroy( text_week_layer );
   text_layer_destroy( temp_layer );
   text_layer_destroy( battery_text_layer );
 
+  // other layers
   layer_destroy(weather_holder);
-	
   effect_layer_destroy(effect_layer2);
+  if (effect_layer != NULL) {
+	  effect_layer_destroy(effect_layer);
+  }
 	
   // Destroy font objects
   fonts_unload_custom_font( font_time );
@@ -851,6 +894,9 @@ void handle_deinit( void ) {
   app_sync_deinit( &app );
 
   // Destroy window
+  layer_remove_from_parent(window_layer);
+  layer_destroy(window_layer);
+	
   window_destroy( window );
 }
 
