@@ -1,3 +1,17 @@
+/*
+Copyright (C) 2015 Mark Reed / Little Gem Software
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
+to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 
 #include <pebble.h>
 #include "languages.h"
@@ -25,9 +39,9 @@ static const uint32_t WEATHER_ICONS[] = {
 static enum statusKeys { STATUS_OFF = 0, STATUS_ON } current_status;
 static enum weatherstatusKeys { WEATHER_OFF = 0, WEATHER_ON } weather_status;
 static enum secsKeys { SECS_OFF = 0, SECS_ON } ampmsecs;
-static enum backgcolKeys { BLUE = 0, LTBLUE, YELLOW, PURPLE, WHITE, GREY, RED, DKBLUE } bgcol_format;
 static enum bluetoothvibeKey { BLUETOOTHVIBE_OFF = 0, BLUETOOTHVIBE_ON } bluetoothvibe_status;
 static enum hourlyvibeKey { HOURLYVIBE_OFF = 0, HOURLYVIBE_ON } hourlyvibe_status;
+static enum backgroundKeys { BGND_BLUE = 0, BGND_LTBLUE, BGND_PURPLES, BGND_YELLOW, BGND_WHITE, BGND_GREY, BGND_RED, BGND_DKBLUE, BGND_LTGREEN, BGND_DKGREEN, BGND_DKBLUE2 } current_background;
 static enum formatKeys { FORMAT_WEEK = 0, FORMAT_DOTY, FORMAT_DDMMYY, FORMAT_MMDDYY, FORMAT_WXDX, FORMAT_INT, FORMAT_DOT, FORMAT_YWD } current_format;
 static enum languageKeys { LANG_EN = 0, LANG_NL, LANG_DE, LANG_FR, LANG_HR, LANG_ES, LANG_IT, LANG_NO, LANG_SW, LANG_FI, LANG_DA, LANG_TU, LANG_CA, LANG_SL } current_language;
 static enum invertKeys { INVERT_ON = 0, INVERT_OFF } invert_format;
@@ -51,8 +65,9 @@ enum settingKeys {
   STARTDAY_KEY = 0xC,
 };
 
-static int hourlyvibe;
-static int background;
+//static int hourlyvibe;
+//static int bluetoothvibe;
+//static int current_background;
 
 static bool appStarted = false;
 
@@ -81,11 +96,13 @@ static TextLayer      *text_week_layer;
 static TextLayer	  *battery_text_layer;
 static TextLayer 	  *temp_layer;
 
-static GFont          *font_time;
-static GFont          *font_days;
-static GFont          *font_date;
-static GFont          *font_other;
-static GFont          *small_batt;
+static GFont          font_round_time;
+static GFont          font_time;
+static GFont          font_days;
+static GFont          font_date;
+static GFont          font_other;
+static GFont          small_batt;
+static GFont          small_batt2;
 
 static AppSync        app;
 static uint8_t        sync_buffer[256];
@@ -95,25 +112,28 @@ int charge_percent = 0;
 static GBitmap *block24_img;
 static BitmapLayer *block24_layer;
 
-static GBitmap *background_image1;
-static BitmapLayer *background_layer1;
-static GBitmap *background_image2;
-static BitmapLayer *background_layer2;
-static GBitmap *background_image3;
-static BitmapLayer *background_layer3;
-static GBitmap *background_image4;
-static BitmapLayer *background_layer4;
-static GBitmap *background_image5;
-static BitmapLayer *background_layer5;
-static GBitmap *background_image6;
-static BitmapLayer *background_layer6;
-static GBitmap *background_image7;
-static BitmapLayer *background_layer7;
-static GBitmap *background_image8;
-static BitmapLayer *background_layer8;
+static GBitmap *background_image;
+static BitmapLayer *background_layer;
 
 
 // Define layer rectangles (x, y, width, height)
+
+#ifdef PBL_PLATFORM_CHALK
+GRect TIME_RECT      = ConstantGRect(  36,   11, 160,  72 );
+GRect AMPM_RECT      = ConstantGRect( 133,  26,  30,  21 );
+GRect SECS_RECT      = ConstantGRect( 132,  27,  30,  21 );
+GRect DATE_RECT      = ConstantGRect(  0, 0, 0,  0 );
+GRect WEEK_RECT      = ConstantGRect(  38, 132, 180,  50 );
+GRect DAYS_RECT      = ConstantGRect(  38,  104, 140,  30 );
+GRect BATT_RECT      = ConstantGRect(  72,  83,  60,  11 );
+GRect BT_RECT        = ConstantGRect( 155, 83,  28,  21 );
+GRect EMPTY_RECT     = ConstantGRect(   0,   0,   0,   0 );
+GRect OFF_DATE_RECT  = ConstantGRect(  0, 0, 0,  0 );
+GRect OFF_WEEK_RECT  = ConstantGRect(  38, 132, 180,  70 );
+GRect TEMP_RECT      = ConstantGRect(  140,  57, 40,  40 );
+GRect ICON_RECT      = ConstantGRect(  0,  0, 0,  0 );
+
+#else
 GRect TIME_RECT      = ConstantGRect(  29,   5, 110,  72 );
 GRect AMPM_RECT      = ConstantGRect( 123,   0,  25,  21 );
 GRect SECS_RECT      = ConstantGRect( 123,   0,  23,  21 );
@@ -128,13 +148,15 @@ GRect OFF_WEEK_RECT  = ConstantGRect(  70, 132, 144,  70 );
 GRect TEMP_RECT      = ConstantGRect(   18,  53, 40,  40 );
 GRect ICON_RECT      = ConstantGRect(   16,  21, 20,  20 );
 
+#endif
+
 // Define placeholders for time and date
 static char time_text[] = "00:00";
 static char ampm_text[] = "XXX";
 static char secs_text[] = "00";
-
+ 
 // Previous bluetooth connection status
-static bool prev_bt_status = false;
+//static bool prev_bt_status = false;
 
 #ifdef LANGUAGE_TESTING
   static int ct = 1;
@@ -161,16 +183,17 @@ static TextLayer * setup_text_layer( GRect rect, GTextAlignment align , GFont fo
 void handle_bluetooth( bool connected ) {
   if ( bluetooth_image != NULL ) {
     gbitmap_destroy( bluetooth_image );
-  }	
+  }
+
   if ( connected ) {
     bluetooth_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BLUETOOTH );
   } else {
     bluetooth_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_NO_BLUETOOTH );
-    if ( prev_bt_status != connected && bluetoothvibe_status) {
-      vibes_short_pulse();
-    }
+ //   if ( prev_bt_status != connected && bluetoothvibe_status) {
+ //     vibes_short_pulse();
+ //   }
   }
-  prev_bt_status = connected;
+//  prev_bt_status = connected;
   bitmap_layer_set_bitmap( bluetooth_layer, bluetooth_image );
 }
 
@@ -183,17 +206,22 @@ void handle_battery( BatteryChargeState charge_state ) {
   if ( battery_image != NULL ) {
     gbitmap_destroy( battery_image );
   }
+#ifdef PBL_PLATFORM_CHALK
 
   if ( charge_state.is_charging ) {
+    battery_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BATT_090_100 );
+	snprintf(battery_text, sizeof(battery_text), "%d", charge_state.charge_percent);
+#else
+  if ( charge_state.is_charging ) {
     battery_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BATT_CHARGING );
-	snprintf(battery_text, sizeof(battery_text), "+%d", charge_state.charge_percent);
-
+	snprintf(battery_text, sizeof(battery_text), "+%d", charge_state.charge_percent);	  
+#endif
   } else {
 	snprintf(battery_text, sizeof(battery_text), "%d", charge_state.charge_percent);       
 
     switch ( charge_state.charge_percent ) {
-      case 0 ... 10:
-        battery_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BATT_000_010 );
+      case 0 ... 10:		
+		battery_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BATT_000_010 );
         break;
       case 11 ... 20:
         battery_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BATT_010_020 );
@@ -230,16 +258,21 @@ void handle_battery( BatteryChargeState charge_state ) {
 }
 
 void invert_screen(bool invert_format) {
-  if (invert_format && effect_layer == NULL) {
+ 
+ if (!invert_format && effect_layer == NULL) {
     // Add inverter layer
     Layer *window_layer = window_get_root_layer(window);
 
 	//creating effect layer with inverter effect
+#ifdef PBL_PLATFORM_CHALK
+  effect_layer = effect_layer_create(GRect(0,0,180,180));
+#else
   effect_layer = effect_layer_create(GRect(0,0,144,168));
+#endif
   effect_layer_add_effect(effect_layer, effect_invert, NULL);
   layer_add_child((window_layer), effect_layer_get_layer(effect_layer));
     
-  } else if (!invert_format && effect_layer != NULL) {
+  } else if (invert_format && effect_layer != NULL) {
     // hide Inverter layer
     layer_remove_from_parent(effect_layer_get_layer(effect_layer));
     effect_layer_destroy(effect_layer);
@@ -247,98 +280,66 @@ void invert_screen(bool invert_format) {
   } 
 }
 
-void bgcol() {
-	
-	switch (background) {
+void bgcol() {		
 		
-	case 0:
-				layer_set_hidden(bitmap_layer_get_layer(background_layer1), false);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
-	break;
+	if (background_image) {
+		gbitmap_destroy(background_image);
+		background_image = NULL;
+    }
 	
-	case 1:
-				layer_set_hidden(bitmap_layer_get_layer(background_layer2), false);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);
-	break;
-	
-	case 2:
-				layer_set_hidden(bitmap_layer_get_layer(background_layer3), false);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
-	break;
-	
-	case 3:
-				layer_set_hidden(bitmap_layer_get_layer(background_layer4), false);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
-	break;
-		
-	case 4:
-				layer_set_hidden(bitmap_layer_get_layer(background_layer5), false);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
-	break;
+	switch (current_background) {
 
-	case 5:
-				layer_set_hidden(bitmap_layer_get_layer(background_layer6), false);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
-	break;
+		case 0:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND1);
+			break;
+
+		case 1:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND2);
+			break;
+
+		case 2:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND3);
+			break;
+
+		case 3:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND4);
+			break;
 		
-	case 6:
-				layer_set_hidden(bitmap_layer_get_layer(background_layer7), false);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer8), true);	
-	break;
+		case 4:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND5);
+			break;
+
+		case 5:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND6);
+			break;
+
+		case 6:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND7);
+			break;
+
+		case 7:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND8);
+			break;
 		
-	case 7:
-				layer_set_hidden(bitmap_layer_get_layer(background_layer8), false);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer1), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer2), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer3), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer5), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer6), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer4), true);	
-				layer_set_hidden(bitmap_layer_get_layer(background_layer7), true);	
-	break;
-	}	
+		case 8:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND9);
+			break;
+
+		case 9:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND10);
+			break;
+		
+		case 10:
+			background_image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND11);
+			break;
+
+    }
+		
+	   if (background_image != NULL) {
+		bitmap_layer_set_bitmap(background_layer, background_image);
+		layer_set_hidden(bitmap_layer_get_layer(background_layer), false);
+		layer_mark_dirty(bitmap_layer_get_layer(background_layer));
+    }
 }
 
 /*
@@ -348,26 +349,26 @@ void update_status( void ) {
   handle_battery( battery_state_service_peek() );
   handle_bluetooth( bluetooth_connection_service_peek() );
 }
-
+/*
 void hourvibe (struct tm *tick_time) {
-  if (appStarted && hourlyvibe) {
+  if ( hourlyvibe_status) {
     //vibe!
     vibes_short_pulse();
   }
 }
-
+*/
 /*
   Handle tick events
 */
 void handle_tick( struct tm *tick_time, TimeUnits units_changed ) {
 	
-	if (units_changed & HOUR_UNIT) {
-    hourvibe(tick_time);
-}
+//  if (units_changed & HOUR_UNIT) {
+//    hourvibe(tick_time);
+//  }
 	
   // Update text layer for current day
 	
-	if (startday_status) {
+  if (startday_status) {
   int today = tick_time->tm_wday ; if ( today < 0 ) { today = 6; }
   layer_set_frame( effect_layer_get_layer(effect_layer2), highlight_rect2[current_language][today] );
 	} else {
@@ -417,6 +418,10 @@ void handle_tick( struct tm *tick_time, TimeUnits units_changed ) {
 	
   // Update status information 
   
+  if ( current_background == BGND_BLUE ) {
+    bgcol();
+	 //      update_status();
+  } 
   if ( current_status == STATUS_ON ) {
     update_status();
   } 
@@ -428,15 +433,11 @@ void handle_tick( struct tm *tick_time, TimeUnits units_changed ) {
   }	
   if ( invert_format == INVERT_OFF ) {
     update_status();
-    //invert_screen(invert_format);
   }	
   if ( textcol_format == COLB_ON ) {
     update_status();
   }
   if ( startday_status == MONDAY_ON ) {
-    update_status();
-  }
-  if ( bgcol_format == BLUE ) {
     update_status();
   }
 }
@@ -466,6 +467,12 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
       persist_write_int( SETTING_FORMAT_KEY, value );
       current_format = value;
       break; 
+
+	case BACKGROUND:
+	  	  persist_write_int( BACKGROUND, value );
+          current_background = value;
+	      bgcol();
+	break; 
 	  
 	case SETTING_ICON_KEY:
     if (icon_bitmap) {
@@ -486,17 +493,18 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
       layer_set_frame( text_layer_get_layer( temp_layer ), ( weather_status == WEATHER_ON ) ? TEMP_RECT : EMPTY_RECT );
       layer_set_frame( bitmap_layer_get_layer( icon_layer ), ( weather_status == WEATHER_ON ) ? ICON_RECT : EMPTY_RECT );
       break;
-	  
+  
     case BLUETOOTHVIBE_KEY:
 	  persist_write_int( BLUETOOTHVIBE_KEY, value );
       bluetoothvibe_status = value;
-      break;        
+      break;      
+   
 	  
 	case HOURLYVIBE_KEY:
 	  persist_write_int( HOURLYVIBE_KEY, value );
-      hourlyvibe = value;
+      hourlyvibe_status = value;
       break;
-	  
+	
 	case SECS_KEY:
 	  persist_write_int( SECS_KEY, value );
       ampmsecs = value;
@@ -512,12 +520,6 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
 	    	tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
       }
       break;
-	
-	case BACKGROUND:
-	  	  persist_write_int( BACKGROUND, value );
-          background = value;
-	      bgcol();
-	break; 
 	  
 	case SETTING_INVERT_KEY:
       persist_write_int( SETTING_INVERT_KEY, value );
@@ -541,7 +543,6 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
 	  }
       break;
 	  	  
-	  
     case STARTDAY_KEY:
 	  persist_write_int( STARTDAY_KEY, value );
       startday_status = value;  	 
@@ -556,7 +557,7 @@ static void tuple_changed_callback( const uint32_t key, const Tuple* tuple_new, 
   Handle errors
 */
 static void app_error_callback( DictionaryResult dict_error, AppMessageResult app_message_error, void* context ) {
-//  APP_LOG( APP_LOG_LEVEL_DEBUG, "app error %d", app_message_error );
+  APP_LOG( APP_LOG_LEVEL_DEBUG, "app error %d", app_message_error );
 //  vibes_double_pulse();
 }
 
@@ -586,9 +587,18 @@ void update_time() {
   Initialization
 */
 void handle_init( void ) {
+		
+  memset(&background_layer, 0, sizeof(background_layer));
+  memset(&background_image, 0, sizeof(background_image));
+	
+  memset(&battery_layer, 0, sizeof(battery_layer));
+  memset(&battery_image, 0, sizeof(battery_image));
+	
   window = window_create();
   window_stack_push( window, true );
   Layer *window_layer = window_get_root_layer( window );
+
+  window_set_background_color(window, GColorBlack);
 
   // Read persistent data
   if ( persist_exists( SETTING_STATUS_KEY ) ) {
@@ -615,7 +625,7 @@ void handle_init( void ) {
     bluetoothvibe_status = persist_read_int( BLUETOOTHVIBE_KEY );
   } else {
     bluetoothvibe_status = BLUETOOTHVIBE_ON;
-  }
+  } 
   if ( persist_exists( STARTDAY_KEY ) ) {
     startday_status = persist_read_int( STARTDAY_KEY );
   } else {
@@ -636,39 +646,39 @@ void handle_init( void ) {
   } else {
     invert_format = INVERT_OFF;
   }
- if ( persist_exists( SETTING_TEXTCOL_KEY ) ) {
+  if ( persist_exists( SETTING_TEXTCOL_KEY ) ) {
     textcol_format = persist_read_int( SETTING_TEXTCOL_KEY );
   } else {
     textcol_format = COLB_ON;
   }
- if ( persist_exists( BACKGROUND ) ) {
-    bgcol_format = persist_read_int( BACKGROUND );
- } else {
-    bgcol_format = BLUE;
-  }	
-	
+  if ( persist_exists( BACKGROUND ) ) {
+    current_background = persist_read_int( BACKGROUND );
+  } else {
+    current_background = BGND_BLUE;
+  }
+
   // Read watchface settings from persistent data or use default values
   current_status = persist_exists( SETTING_STATUS_KEY ) ? persist_read_int( SETTING_STATUS_KEY ) : STATUS_ON;
   weather_status = persist_exists( SETTING_WEATHERSTATUS_KEY ) ? persist_read_int( SETTING_WEATHERSTATUS_KEY ) : WEATHER_ON;
   current_language = persist_exists( SETTING_LANGUAGE_KEY ) ? persist_read_int( SETTING_LANGUAGE_KEY ) : LANG_EN;
   current_format = persist_exists( SETTING_FORMAT_KEY ) ? persist_read_int( SETTING_FORMAT_KEY ) : FORMAT_WEEK;
+  current_background = persist_exists( BACKGROUND ) ? persist_read_int( BACKGROUND ) : BGND_BLUE;
   bluetoothvibe_status = persist_exists( BLUETOOTHVIBE_KEY ) ? persist_read_int( BLUETOOTHVIBE_KEY ) : BLUETOOTHVIBE_ON;
   hourlyvibe_status = persist_exists( HOURLYVIBE_KEY ) ? persist_read_int( HOURLYVIBE_KEY ) : HOURLYVIBE_ON;
   ampmsecs = persist_exists( SECS_KEY ) ? persist_read_int( SECS_KEY ) : SECS_ON;
   invert_format = persist_exists( SETTING_INVERT_KEY ) ? persist_read_int( SETTING_INVERT_KEY ) : INVERT_OFF;
   textcol_format = persist_exists( SETTING_TEXTCOL_KEY ) ? persist_read_int( SETTING_TEXTCOL_KEY ) : COLB_ON;
   startday_status = persist_exists( STARTDAY_KEY ) ? persist_read_int( STARTDAY_KEY ) : MONDAY_ON;
-  bgcol_format = persist_exists( BACKGROUND ) ? persist_read_int( BACKGROUND ) : BLUE;
 
   // Initial settings
   Tuplet initial_values[] = { TupletInteger( SETTING_STATUS_KEY, current_status )
 	  						, TupletInteger( SETTING_WEATHERSTATUS_KEY, weather_status )
                             , TupletInteger( SETTING_LANGUAGE_KEY, current_language )
                             , TupletInteger( SETTING_FORMAT_KEY, current_format )
+                            , TupletInteger( BACKGROUND, current_background )								
                             , TupletInteger( BLUETOOTHVIBE_KEY, bluetoothvibe_status )
                             , TupletInteger( HOURLYVIBE_KEY, hourlyvibe_status )
                             , TupletInteger( SECS_KEY, ampmsecs )
-                            , TupletInteger( BACKGROUND, bgcol_format )
 							, TupletInteger( SETTING_ICON_KEY, (uint8_t) 14)
                             , TupletCString( SETTING_TEMPERATURE_KEY, "")
                             , TupletInteger( SETTING_INVERT_KEY, invert_format)
@@ -692,69 +702,68 @@ void handle_init( void ) {
   // Perform sync
   app_sync_set( &app, initial_values, ARRAY_LENGTH( initial_values ) );
 
-  appStarted = true;
 	
   // Adjust GRect for Hours and Minutes to compensate for missing AM/PM indicator
   if ( clock_is_24h_style() ) {
     TIME_RECT.origin.y = TIME_RECT.origin.y + 1;
   }
-
+ 
   // Load fonts
-  font_time = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_68 ) );
+
   font_days = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_20 ) );
   font_date = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_23 ) );
   font_other = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_19 ) );
-  small_batt = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_KCREG_16 ) );
+  small_batt = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARSB_19 ) );
+  small_batt2 = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_18 ) );
+  font_time = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_68 ) );
+  font_round_time = fonts_load_custom_font( resource_get_handle( RESOURCE_ID_FONT_LCARS_64 ) );
 
-  // Background images
+  // Background image
+	
+#ifdef PBL_PLATFORM_CHALK
+  background_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND1 );
+  background_layer = bitmap_layer_create(GRect(0, 0, 180, 180));
+  bitmap_layer_set_bitmap( background_layer, background_image );
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(background_layer));
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer ) );
+#else
+  background_image = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND1 );
+  background_layer = bitmap_layer_create( layer_get_frame( window_layer ) );
+  bitmap_layer_set_bitmap( background_layer, background_image );
+  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer ) );
+#endif
 
-  background_image1 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND1 );
-  background_layer1 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer1, background_image1 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer1 ) );
+  // Setup battery layer
+  battery_layer = bitmap_layer_create( BATT_RECT );
+  layer_add_child( window_layer, bitmap_layer_get_layer( battery_layer ) );
 
-  background_image2 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND2 );
-  background_layer2 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer2, background_image2 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer2 ) );
-	
-  background_image3 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND3 );
-  background_layer3 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer3, background_image3 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer3 ) );
-
-  background_image4 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND4 );
-  background_layer4 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer4, background_image4 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer4 ) );
-	
-  background_image5 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND5 );
-  background_layer5 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer5, background_image5 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer5 ) );
-	
-  background_image6 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND6 );
-  background_layer6 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer6, background_image6 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer6 ) );
-	
-  background_image7 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND7 );
-  background_layer7 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer7, background_image7 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer7 ) );
-	
-  background_image8 = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BACKGROUND8 );
-  background_layer8 = bitmap_layer_create( layer_get_frame( window_layer ) );
-  bitmap_layer_set_bitmap( background_layer8, background_image8 );
-  layer_add_child( window_layer, bitmap_layer_get_layer( background_layer8 ) );
-
+  // Setup bluetooth layer
+  bluetooth_layer = bitmap_layer_create( BT_RECT );
+  layer_add_child( window_layer, bitmap_layer_get_layer( bluetooth_layer ) );
 	
   // Setup time layer
+	
+#ifdef PBL_PLATFORM_CHALK
+  text_time_layer = setup_text_layer( TIME_RECT, GTextAlignmentLeft, font_round_time );		
+  layer_add_child( window_layer, text_layer_get_layer( text_time_layer ) );
+#else
   text_time_layer = setup_text_layer( TIME_RECT, GTextAlignmentRight, font_time );		
   layer_add_child( window_layer, text_layer_get_layer( text_time_layer ) );
+#endif
 
-  // Setup AM/PM name layer
-  if ( !clock_is_24h_style() ) {
+  // Setup AM/PM layer
+	
+#ifdef PBL_PLATFORM_CHALK
+ if ( !clock_is_24h_style() ) {	 
+  block24_img = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLOCK24);
+  block24_layer = bitmap_layer_create(GRect(130, 25, 25, 20));
+  bitmap_layer_set_bitmap(block24_layer, block24_img);
+  layer_add_child(window_layer, bitmap_layer_get_layer(block24_layer));	
+	}		
+  text_ampm_layer = setup_text_layer( AMPM_RECT, GTextAlignmentLeft, font_other );
+  layer_add_child( window_layer, text_layer_get_layer( text_ampm_layer ) );	
+#else
+ if ( !clock_is_24h_style() ) {
   block24_img = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLOCK24);
   block24_layer = bitmap_layer_create(GRect(125, -1, 25, 20));
   bitmap_layer_set_bitmap(block24_layer, block24_img);
@@ -763,6 +772,25 @@ void handle_init( void ) {
   text_ampm_layer = setup_text_layer( AMPM_RECT, GTextAlignmentCenter, font_other );
   text_layer_set_background_color(text_ampm_layer, GColorClear);
   layer_add_child( window_layer, text_layer_get_layer( text_ampm_layer ) );
+#endif
+	
+  // set up battery text layer
+	
+#ifdef PBL_PLATFORM_CHALK
+  battery_text_layer = text_layer_create(GRect(49, 77, 40, 30));	
+  text_layer_set_background_color(battery_text_layer, GColorClear);
+  text_layer_set_text_color(battery_text_layer, GColorWhite);
+  text_layer_set_font(battery_text_layer, small_batt2);
+  text_layer_set_text_alignment(battery_text_layer, GTextAlignmentLeft);
+  layer_add_child(window_layer, text_layer_get_layer(battery_text_layer));		
+#else
+  battery_text_layer = text_layer_create(GRect(48, 76, 34, 30));	
+  text_layer_set_background_color(battery_text_layer, GColorBlack);
+  text_layer_set_text_color(battery_text_layer, GColorWhite);
+  text_layer_set_font(battery_text_layer, small_batt);
+  text_layer_set_text_alignment(battery_text_layer, GTextAlignmentRight);
+  layer_add_child(window_layer, text_layer_get_layer(battery_text_layer));	
+#endif
 	
   // Setup days line layer
   text_days_layer = setup_text_layer( DAYS_RECT
@@ -778,57 +806,76 @@ void handle_init( void ) {
   effect_layer2 = effect_layer_create(EMPTY_RECT);
   effect_layer_add_effect(effect_layer2, effect_invert, NULL);
   layer_add_child((window_layer), effect_layer_get_layer(effect_layer2));
-	
+
   // Setup date layer
-  text_date_layer = setup_text_layer( ( current_status == STATUS_ON ) ? DATE_RECT : OFF_DATE_RECT
+	
+ #ifdef PBL_PLATFORM_CHALK
+ text_date_layer = setup_text_layer( ( current_status == STATUS_ON ) ? DATE_RECT : OFF_DATE_RECT
+                                    , GTextAlignmentCenter
+                                    , small_batt );		
+	  text_layer_set_text_color(text_date_layer, GColorBlack);
+  text_layer_set_background_color(text_date_layer, GColorClear);
+
+#else
+ text_date_layer = setup_text_layer( ( current_status == STATUS_ON ) ? DATE_RECT : OFF_DATE_RECT
                                     , GTextAlignmentLeft
                                     , font_date );		
+	
+#endif
   layer_add_child( window_layer, text_layer_get_layer( text_date_layer ) );
 
   // Setup week layer
-  text_week_layer = setup_text_layer( ( current_status == STATUS_ON ) ? WEEK_RECT : OFF_WEEK_RECT
+	
+ #ifdef PBL_PLATFORM_CHALK
+text_week_layer = setup_text_layer( ( current_status == STATUS_ON ) ? WEEK_RECT : OFF_WEEK_RECT
                                     , GTextAlignmentLeft
                                     , font_date );
+#else
+ text_week_layer = setup_text_layer( ( current_status == STATUS_ON ) ? WEEK_RECT : OFF_WEEK_RECT
+                                    , GTextAlignmentLeft
+                                    , font_date );
+#endif
   layer_add_child( window_layer, text_layer_get_layer( text_week_layer ) );
   
   // Setup weather info
-  Layer *weather_holder = layer_create(GRect(0, 0, 144, 168 ));
+	
+#ifdef PBL_PLATFORM_CHALK
+  Layer *weather_holder = layer_create(GRect(0, 0, 180, 180 ));
   layer_add_child(window_layer, weather_holder);
-
+#else
+	 Layer *weather_holder = layer_create(GRect(0, 0, 144, 168 ));
+  layer_add_child(window_layer, weather_holder);
+#endif
+	
   icon_layer = bitmap_layer_create( ( weather_status == WEATHER_ON ) ? ICON_RECT : EMPTY_RECT );	
   layer_add_child(weather_holder, bitmap_layer_get_layer(icon_layer));
 
+#ifdef PBL_PLATFORM_CHALK
    temp_layer = setup_text_layer( ( weather_status == WEATHER_ON ) ? TEMP_RECT : EMPTY_RECT
 	                            , GTextAlignmentLeft
                                 , font_other );
+#else
+   temp_layer = setup_text_layer( ( weather_status == WEATHER_ON ) ? TEMP_RECT : EMPTY_RECT
+	                            , GTextAlignmentLeft
+                                , font_other );	
+#endif
   layer_add_child(weather_holder, text_layer_get_layer(temp_layer));
 
-  // Setup battery layer
-  battery_layer = bitmap_layer_create( BATT_RECT );
-  layer_add_child( window_layer, bitmap_layer_get_layer( battery_layer ) );
-
-  // Setup bluetooth layer
-  bluetooth_layer = bitmap_layer_create( BT_RECT );
-  layer_add_child( window_layer, bitmap_layer_get_layer( bluetooth_layer ) );
-	
   // Setup seconds name layer
-  text_secs_layer = setup_text_layer( SECS_RECT, GTextAlignmentCenter, font_other );
+  text_secs_layer = setup_text_layer( SECS_RECT, GTextAlignmentCenter, small_batt );
   text_layer_set_background_color(text_secs_layer, GColorBlack);
   layer_add_child( window_layer, text_layer_get_layer( text_secs_layer ) );
 
-  // set up battery text layer	
-  battery_text_layer = text_layer_create(GRect(55, 78, 26, 20));	
-  text_layer_set_background_color(battery_text_layer, GColorBlack);
-  text_layer_set_text_color(battery_text_layer, GColorWhite);
-  text_layer_set_font(battery_text_layer, small_batt);
-  text_layer_set_text_alignment(battery_text_layer, GTextAlignmentRight);
-  layer_add_child(window_layer, text_layer_get_layer(battery_text_layer));	
-	
   // Subscribe to services
   tick_timer_service_subscribe( SECOND_UNIT, handle_tick );
-
+  battery_state_service_subscribe(&handle_battery);
+  bluetooth_connection_service_subscribe(&handle_bluetooth);
+	
   // Force update to avoid a blank screen at startup of the watchface
   update_time();
+	
+  appStarted = true;
+
 }
 
 /*
@@ -852,15 +899,7 @@ void handle_deinit( void ) {
   bluetooth_connection_service_unsubscribe();
 
   // Destroy image objects
-  destroy_graphics( background_image1, background_layer1 );
-  destroy_graphics( background_image2, background_layer2 );
-  destroy_graphics( background_image3, background_layer3 );
-  destroy_graphics( background_image4, background_layer4 );
-  destroy_graphics( background_image5, background_layer5 );
-  destroy_graphics( background_image6, background_layer6 );
-  destroy_graphics( background_image7, background_layer7 );
-  destroy_graphics( background_image8, background_layer8 );
-
+  destroy_graphics( background_image, background_layer );
   destroy_graphics( block24_img, block24_layer );
   destroy_graphics( battery_image, battery_layer );
   destroy_graphics( bluetooth_image, bluetooth_layer );
@@ -885,6 +924,7 @@ void handle_deinit( void ) {
 	
   // Destroy font objects
   fonts_unload_custom_font( font_time );
+  fonts_unload_custom_font( font_round_time );
   fonts_unload_custom_font( font_days );
   fonts_unload_custom_font( font_date );
   fonts_unload_custom_font( font_other );

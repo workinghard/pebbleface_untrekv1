@@ -69,8 +69,8 @@ var imageId = {
 var options = JSON.parse(localStorage.getItem('options'));
 //console.log('read options: ' + JSON.stringify(options));
 if (options === null) options = {
-				"use_gps" : "true",
-				"location" : "",
+				"use_gps" : "false",
+				"location" : "london",
 				"units" : "fahrenheit",
 				"status" : "true",
 				"language" : "",
@@ -164,7 +164,7 @@ function getWeatherFromWoeid(woeid) {
 			"hourlyvibe" : (options["hourlyvibe"] == "true" ? 1 : 0 ),
 			"ampmsecs" : (options["ampmsecs"] == "true" ? 1 : 0 ),
 			"textcol" : (options["textcol"] == "true" ? 1 : 0 ),
-			"invert" : (options["invert"] == "true" ? 1 : 0),
+			"invert" : (options["invert"] == "true" ? 0 : 1),
 			"startday_status" : (options["startday_status"] == "true" ? 1 : 0 ),
 
           });
@@ -203,7 +203,7 @@ function locationError(err) {
 }
 
 Pebble.addEventListener('showConfiguration', function(e) {
-	var uri = 'http://www.themapman.com/pebblewatch/trekv38.html?' + 
+	var uri = 'http://www.themapman.com/pebblewatch/trekv393.html?' + 
     'use_gps=' + encodeURIComponent(options['use_gps']) +
     '&location=' + encodeURIComponent(options['location']) +
     '&units=' + encodeURIComponent(options['units']) +
