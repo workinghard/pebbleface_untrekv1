@@ -133,7 +133,7 @@ function getWeatherFromLocation(location_name) {
 }
 
 function getWeatherFromWoeid(woeid) {
-  var celsius = options['units'] == 'celsius';
+  var celsius = options.units == 'celsius';
   var query = encodeURI("select item.condition from weather.forecast where woeid = " + woeid +
                         " and u = " + (celsius ? "\"c\"" : "\"f\""));
   var url = "http://query.yahooapis.com/v1/public/yql?q=" + query + "&format=json";
@@ -147,25 +147,25 @@ function getWeatherFromWoeid(woeid) {
         response = JSON.parse(req.responseText);
         if (response) {
           var condition = response.query.results.channel.item.condition;
-          temperature = condition.temp + (celsius ? "\u00B0" : "\u00B0");
-          icon = imageId[condition.code];
+          var temperature = condition.temp + (celsius ? "\u00B0" : "\u00B0");
+          var icon = imageId[condition.code];
           // console.log("temp " + temperature);
           // console.log("icon " + icon);
           // console.log("condition " + condition.text);
           Pebble.sendAppMessage({
             "icon" : icon,
             "temperature" : temperature,
-			"format" : options["format"],
-			"language" : options["language"],
-			"background" : options["background"],
-			"status" : (options["status"] == "true" ? 1 : 0 ),
-			"weatherstatus" : (options["weatherstatus"] == "true" ? 1 : 0 ),
-			"bluetoothvibe" : (options["bluetoothvibe"] == "true" ? 1 : 0 ),
-			"hourlyvibe" : (options["hourlyvibe"] == "true" ? 1 : 0 ),
-			"ampmsecs" : (options["ampmsecs"] == "true" ? 1 : 0 ),
-			"textcol" : (options["textcol"] == "true" ? 1 : 0 ),
-			"invert" : (options["invert"] == "true" ? 0 : 1),
-			"startday_status" : (options["startday_status"] == "true" ? 1 : 0 ),
+			"format" : options.format,
+			"language" : options.language,
+			"background" : options.background,
+			"status" : (options.status == "true" ? 1 : 0 ),
+			"weatherstatus" : (options.weatherstatus == "true" ? 1 : 0 ),
+			"bluetoothvibe" : (options.bluetoothvibe == "true" ? 1 : 0 ),
+			"hourlyvibe" : (options.hourlyvibe == "true" ? 1 : 0 ),
+			"ampmsecs" : (options.ampmsecs == "true" ? 1 : 0 ),
+			"textcol" : (options.textcol == "true" ? 1 : 0 ),
+			"invert" : (options.invert == "true" ? 0 : 1),
+			"startday_status" : (options.startday_status == "true" ? 1 : 0 ),
 
           });
         }
@@ -177,17 +177,16 @@ function getWeatherFromWoeid(woeid) {
   req.send(null);
 }
 
+var locationOptions = { "timeout": 15000, "maximumAge": 60000 };
 function updateWeather() {
-  if (options['use_gps'] == "true") {
+  if (options.use_gps == "true") {
     window.navigator.geolocation.getCurrentPosition(locationSuccess,
                                                     locationError,
                                                     locationOptions);
   } else {
-    getWeatherFromLocation(options["location"]);
+    getWeatherFromLocation(options.location);
   }
 }
-
-var locationOptions = { "timeout": 15000, "maximumAge": 60000 };
 
 function locationSuccess(pos) {
   var coordinates = pos.coords;
@@ -204,20 +203,20 @@ function locationError(err) {
 
 Pebble.addEventListener('showConfiguration', function(e) {
 	var uri = 'http://www.themapman.com/pebblewatch/trekv393.html?' + 
-    'use_gps=' + encodeURIComponent(options['use_gps']) +
-    '&location=' + encodeURIComponent(options['location']) +
-    '&units=' + encodeURIComponent(options['units']) +
-    '&status=' + encodeURIComponent(options['status']) +
-    '&format=' + encodeURIComponent(options['format']) +
-    '&language=' + encodeURIComponent(options['language']) +
-    '&weatherstatus=' + encodeURIComponent(options['weatherstatus']) +
-    '&bluetoothvibe=' + encodeURIComponent(options['bluetoothvibe']) +
-    '&hourlyvibe=' + encodeURIComponent(options['hourlyvibe']) +
-    '&ampmsecs=' + encodeURIComponent(options['ampmsecs']) +
-    '&background=' + encodeURIComponent(options['background']) +
-    '&invert=' + encodeURIComponent(options['invert']) +
-    '&textcol=' + encodeURIComponent(options['textcol']) +
-    '&startday_status=' + encodeURIComponent(options['startday_status']);
+    'use_gps=' + encodeURIComponent(options.use_gps) +
+    '&location=' + encodeURIComponent(options.location) +
+    '&units=' + encodeURIComponent(options.units) +
+    '&status=' + encodeURIComponent(options.status) +
+    '&format=' + encodeURIComponent(options.format) +
+    '&language=' + encodeURIComponent(options.language) +
+    '&weatherstatus=' + encodeURIComponent(options.weatherstatus) +
+    '&bluetoothvibe=' + encodeURIComponent(options.bluetoothvibe) +
+    '&hourlyvibe=' + encodeURIComponent(options.hourlyvibe) +
+    '&ampmsecs=' + encodeURIComponent(options.ampmsecs) +
+    '&background=' + encodeURIComponent(options.background) +
+    '&invert=' + encodeURIComponent(options.invert) +
+    '&textcol=' + encodeURIComponent(options.textcol) +
+    '&startday_status=' + encodeURIComponent(options.startday_status);
 
   //console.log('showing configuration at uri: ' + uri);
 

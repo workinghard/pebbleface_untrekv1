@@ -281,12 +281,12 @@ void invert_screen(bool invert_format) {
 }
 
 void bgcol() {		
-		
+	
 	if (background_image) {
 		gbitmap_destroy(background_image);
 		background_image = NULL;
     }
-	
+	return;
 	switch (current_background) {
 
 		case 0:

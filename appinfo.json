@@ -19,10 +19,47 @@
         "configurable"
     ],
     "companyName": "chops",
-    "longName": "Trekv3",
+    "enableMultiJS": false,
+    "longName": "UnTrekv1",
     "projectType": "native",
     "resources": {
         "media": [
+            {
+                "file": "images/white_bg.png",
+                "name": "IMAGE_BACKGROUND5",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/red_bg.png",
+                "name": "IMAGE_BACKGROUND7",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/no_bluetooth.png",
+                "name": "IMAGE_NO_BLUETOOTH",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/menu_icon_trekv2.png",
+                "menuIcon": true,
+                "name": "IMAGE_MENU_ICON",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/lt_green_bg2.png",
+                "name": "IMAGE_BACKGROUND9",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/grey_bg.png",
+                "name": "IMAGE_BACKGROUND6",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/dkblue_bg.png",
+                "name": "IMAGE_BACKGROUND8",
+                "type": "bitmap"
+            },
             {
                 "file": "images/dkblue_bg2.png",
                 "name": "IMAGE_BACKGROUND11",
@@ -34,23 +71,8 @@
                 "type": "bitmap"
             },
             {
-                "file": "images/white_bg.png",
-                "name": "IMAGE_BACKGROUND5",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/lt_green_bg2.png",
-                "name": "IMAGE_BACKGROUND9",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/PURPLE_BG2.png",
-                "name": "IMAGE_BACKGROUND3",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/YELLOWBG2.png",
-                "name": "IMAGE_BACKGROUND4",
+                "file": "images/default.png",
+                "name": "IMAGE_BACKGROUND1",
                 "type": "bitmap"
             },
             {
@@ -59,108 +81,25 @@
                 "type": "bitmap"
             },
             {
-                "file": "images/14.png",
-                "name": "CLOUD",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_060_070.png",
-                "name": "IMAGE_BATT_060_070",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_020_030.png",
-                "name": "IMAGE_BATT_020_030",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/18.png",
-                "name": "RAIN",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_010_020.png",
-                "name": "IMAGE_BATT_010_020",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/8.png",
-                "name": "PARTLY_CLOUDY_DAY",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_080_090.png",
-                "name": "IMAGE_BATT_080_090",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/FOG.png",
-                "name": "FOG",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/23.png",
-                "name": "SNOW",
+                "file": "images/blockout24.png",
+                "name": "IMAGE_BLOCK24",
                 "type": "bitmap"
             },
             {
                 "file": "images/batt_charging.png",
                 "name": "IMAGE_BATT_CHARGING",
+                "targetPlatforms": null,
                 "type": "bitmap"
             },
             {
-                "file": "images/13.png",
-                "name": "HAZE",
+                "file": "images/YELLOWBG2.png",
+                "name": "IMAGE_BACKGROUND4",
+                "targetPlatforms": null,
                 "type": "bitmap"
             },
             {
-                "file": "images/BATT_000_010.png",
-                "name": "IMAGE_BATT_000_010",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/2.png",
-                "name": "CLEAR_DAY",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/dkblue_bg.png",
-                "name": "IMAGE_BACKGROUND8",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_070_080.png",
-                "name": "IMAGE_BATT_070_080",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/9.png",
-                "name": "PARTLY_CLOUDY_NIGHT",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/default.png",
-                "name": "IMAGE_BACKGROUND1",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_030_040.png",
-                "name": "IMAGE_BATT_030_040",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_040_050.png",
-                "name": "IMAGE_BATT_040_050",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_090_100.png",
-                "name": "IMAGE_BATT_090_100",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/BATT_050_060.png",
-                "name": "IMAGE_BATT_050_060",
+                "file": "images/PURPLE_BG2.png",
+                "name": "IMAGE_BACKGROUND3",
                 "type": "bitmap"
             },
             {
@@ -169,70 +108,89 @@
                 "type": "bitmap"
             },
             {
-                "file": "images/no_bluetooth.png",
-                "name": "IMAGE_NO_BLUETOOTH",
+                "file": "images/FOG.png",
+                "name": "FOG",
                 "type": "bitmap"
             },
             {
-                "file": "images/red_bg.png",
-                "name": "IMAGE_BACKGROUND7",
+                "file": "images/BATT_090_100.png",
+                "name": "IMAGE_BATT_090_100",
+                "targetPlatforms": null,
                 "type": "bitmap"
             },
             {
-                "file": "images/grey_bg.png",
-                "name": "IMAGE_BACKGROUND6",
+                "file": "images/BATT_080_090.png",
+                "name": "IMAGE_BATT_080_090",
+                "targetPlatforms": null,
                 "type": "bitmap"
             },
             {
-                "file": "images/blockout24.png",
-                "name": "IMAGE_BLOCK24",
+                "file": "images/BATT_070_080.png",
+                "name": "IMAGE_BATT_070_080",
+                "targetPlatforms": null,
                 "type": "bitmap"
             },
             {
-                "file": "images/menu_icon_trekv2.png",
-                "menuIcon": true,
-                "name": "IMAGE_MENU_ICON",
+                "file": "images/BATT_060_070.png",
+                "name": "IMAGE_BATT_060_070",
+                "targetPlatforms": null,
                 "type": "bitmap"
             },
             {
-                "characterRegex": "[0-9+]",
-                "file": "fonts/LCARS.ttf",
-                "name": "FONT_LCARS_18",
-                "trackingAdjust": 1,
-                "type": "font"
+                "file": "images/BATT_050_060.png",
+                "name": "IMAGE_BATT_050_060",
+                "targetPlatforms": null,
+                "type": "bitmap"
             },
             {
-                "file": "fonts/LCARS.ttf",
-                "name": "FONT_LCARSB_19",
-                "trackingAdjust": 1,
-                "type": "font"
+                "file": "images/BATT_040_050.png",
+                "name": "IMAGE_BATT_040_050",
+                "targetPlatforms": null,
+                "type": "bitmap"
             },
             {
-                "file": "fonts/LCARS.ttf",
-                "name": "FONT_LCARS_19",
-                "type": "font"
+                "file": "images/BATT_030_040.png",
+                "name": "IMAGE_BATT_030_040",
+                "targetPlatforms": null,
+                "type": "bitmap"
             },
             {
-                "characterRegex": "[0-9:. ]",
-                "file": "fonts/LCARS.ttf",
-                "name": "FONT_LCARS_68",
-                "type": "font"
+                "file": "images/BATT_020_030.png",
+                "name": "IMAGE_BATT_020_030",
+                "targetPlatforms": null,
+                "type": "bitmap"
             },
             {
-                "file": "fonts/LCARS.ttf",
-                "name": "FONT_LCARS_23",
-                "type": "font"
+                "file": "images/BATT_010_020.png",
+                "name": "IMAGE_BATT_010_020",
+                "targetPlatforms": null,
+                "type": "bitmap"
             },
             {
-                "file": "fonts/LCARS.ttf",
-                "name": "FONT_LCARS_20",
-                "type": "font"
+                "file": "images/BATT_000_010.png",
+                "name": "IMAGE_BATT_000_010",
+                "targetPlatforms": null,
+                "type": "bitmap"
             },
             {
-                "characterRegex": "[0-9: ]",
-                "file": "fonts/LCARS.ttf",
-                "name": "FONT_LCARS_64",
-                "type": "font"
+                "file": "images/9.png",
+                "name": "PARTLY_CLOUDY_NIGHT",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/8.png",
+                "name": "PARTLY_CLOUDY_DAY",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/7.png",
+                "name": "COLD",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/6.png",
+                "name": "WINDY",
+                "type": "bitmap"
             },
             {
                 "file": "images/45.png",
@@ -245,18 +203,8 @@
                 "type": "bitmap"
             },
             {
-                "file": "images/6.png",
-                "name": "WINDY",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/7.png",
-                "name": "COLD",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/24.png",
-                "name": "HAIL",
+                "file": "images/27.png",
+                "name": "STORM",
                 "type": "bitmap"
             },
             {
@@ -265,21 +213,84 @@
                 "type": "bitmap"
             },
             {
-                "file": "images/27.png",
-                "name": "STORM",
+                "file": "images/24.png",
+                "name": "HAIL",
                 "type": "bitmap"
+            },
+            {
+                "file": "images/23.png",
+                "name": "SNOW",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/2.png",
+                "name": "CLEAR_DAY",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/18.png",
+                "name": "RAIN",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/14.png",
+                "name": "CLOUD",
+                "type": "bitmap"
+            },
+            {
+                "file": "images/13.png",
+                "name": "HAZE",
+                "type": "bitmap"
+            },
+            {
+                "characterRegex": "[0-9: ]",
+                "file": "fonts/LCARS.ttf",
+                "name": "FONT_LCARS_64",
+                "type": "font"
+            },
+            {
+                "file": "fonts/LCARS.ttf",
+                "name": "FONT_LCARS_20",
+                "type": "font"
+            },
+            {
+                "file": "fonts/LCARS.ttf",
+                "name": "FONT_LCARS_23",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9:. ]",
+                "file": "fonts/LCARS.ttf",
+                "name": "FONT_LCARS_68",
+                "type": "font"
+            },
+            {
+                "file": "fonts/LCARS.ttf",
+                "name": "FONT_LCARS_19",
+                "type": "font"
+            },
+            {
+                "file": "fonts/LCARS.ttf",
+                "name": "FONT_LCARSB_19",
+                "trackingAdjust": 1,
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9+]",
+                "file": "fonts/LCARS.ttf",
+                "name": "FONT_LCARS_18",
+                "trackingAdjust": 1,
+                "type": "font"
             }
         ]
     },
     "sdkVersion": "3",
-    "shortName": "Trekv3",
+    "shortName": "UnTrekv1",
     "targetPlatforms": [
-        "aplite",
-        "basalt",
-        "chalk"
+        "basalt"
     ],
-    "uuid": "5e5ad7fc-fa5d-49d6-b5db-2f0fe8a19ac6",
-    "versionLabel": "2.8",
+    "uuid": "85b8ec09-a935-42d5-9dec-a48c945270d7",
+    "versionLabel": "1.0",
     "watchapp": {
         "watchface": true
     }
